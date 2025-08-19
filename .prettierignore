@@ -1,0 +1,5 @@
+build
+coverage
+public
+node_modules
+src/i18n/messages/*.json
