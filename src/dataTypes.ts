@@ -55,14 +55,14 @@ export const $Number = createDataTypeCtr<number>((options) => {
     return {
       serialize: String,
       deserialize: (serializedValue) =>
-        serializedValue ? parseInt(serializedValue, 10) : options.defaultValue,
+        serializedValue ? parseFloat(serializedValue) : options.defaultValue,
     };
   }
 
   return {
     serialize: String,
     deserialize: (serializedValue) =>
-      serializedValue ? parseInt(serializedValue, 10) : null,
+      serializedValue ? parseFloat(serializedValue) : null,
   };
 });
 
