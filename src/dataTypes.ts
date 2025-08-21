@@ -1,11 +1,15 @@
 import { DataType } from './types';
 
-export const createDataTypeCtr = <T>(
-  impl: (options?: { defaultValue?: T }) => DataType<T, any>,
+export const createDataTypeCtr = <T, ExtraOptions extends object = {}>(
+  impl: (options?: { defaultValue?: T } & ExtraOptions) => DataType<T, any>,
 ) => {
   function $DataType(): DataType<T, null>;
-  function $DataType(options: { defaultValue: T }): DataType<T, T>;
-  function $DataType(options?: { defaultValue?: T }): DataType<T, any> {
+  function $DataType(
+    options: { defaultValue: T } & ExtraOptions,
+  ): DataType<T, T>;
+  function $DataType(
+    options?: { defaultValue?: T } & ExtraOptions,
+  ): DataType<T, any> {
     return impl(options);
   }
 
@@ -28,27 +32,31 @@ export const $String = createDataTypeCtr<string>((options) => {
   };
 });
 
-export const $StringArray = createDataTypeCtr<string[]>((options) => {
-  const separator = `*${Math.random()}*`.slice(-4, -1);
+const defaultDelimiter = '*___delimiter___*';
 
-  const serialize = (value: string[]) => value.join(separator);
+export const $StringArray = createDataTypeCtr<string[], { delimiter?: string }>(
+  (options) => {
+    const delimiter = options?.delimiter ?? defaultDelimiter;
 
-  if (options?.defaultValue !== undefined) {
+    const serialize = (value: string[]) => value.join(delimiter);
+
+    if (options?.defaultValue !== undefined) {
+      return {
+        serialize,
+        deserialize: (serializedValue) =>
+          serializedValue
+            ? serializedValue.split(delimiter)
+            : options.defaultValue,
+      };
+    }
+
     return {
       serialize,
       deserialize: (serializedValue) =>
-        serializedValue
-          ? serializedValue.split(separator)
-          : options.defaultValue,
+        serializedValue ? serializedValue.split(delimiter) : null,
     };
-  }
-
-  return {
-    serialize,
-    deserialize: (serializedValue) =>
-      serializedValue ? serializedValue.split(separator) : null,
-  };
-});
+  },
+);
 
 export const $Number = createDataTypeCtr<number>((options) => {
   if (options?.defaultValue !== undefined) {
@@ -75,7 +83,9 @@ export const $NumberArray = createDataTypeCtr<number[]>((options) => {
     return {
       serialize,
       deserialize: (serializedValue) =>
-        serializedValue ? serializedValue.split(',') : options.defaultValue,
+        serializedValue
+          ? serializedValue.split(',').map(parseFloat)
+          : options.defaultValue,
     };
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "@sasha.p/use-persistent-state",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "set of hooks and tools that have useState-like semantic but allows to persist state in various storage",
   "main": "dist/use-persistent-state.umd.js",
   "module": "use-persistent-state.es.js",
